@@ -1,16 +1,36 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
+import {  useRouter } from "next/router";
 import { LockClosedIcon } from '@heroicons/react/solid';
+import { useAuth } from '@hooks/useAuth';
 
 export default function LoginPage() {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
+  const auth = useAuth();
+  const [errorLogin, setErrorLogin] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const submitHandler = (event) => {
     event.preventDefault();
 
     const email = emailRef.current.value;
     const password = passwordRef.current.value;
-
+    auth.signIn(email, password).then(() => {
+      // console.log('login success');
+      router.push('/dashboard');
+    })
+    .catch(function (error) {
+      if (error.response?.status === 401) {
+        setErrorLogin('Usuario o password incorrecto.');
+      } else if (error.request) {
+        setErrorLogin('Tenemos un problema');
+      }
+      //  else {
+      //   setErrorLogin('Algo salió mal.');
+      // }
+      setLoading(false);
+    });
   };
 
   return (
@@ -82,6 +102,17 @@ export default function LoginPage() {
                 Sign in
               </button>
             </div>
+            {errorLogin && (
+              <div className="p-3 mb-3 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+               <span className="font-medium">Error!</span> {errorLogin}
+               </div>
+              )}
+              {loading && (
+              <span className="flex absolute h-4 w-4 top-0 right-0 -mt-1 -mr-1">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-300 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-4 w-4 bg-indigo-400"></span>
+              </span>
+                )}
           </form>
         </div>
       </div>
