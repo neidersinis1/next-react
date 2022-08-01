@@ -1,13 +1,27 @@
 // import { useState } from 'react';
-import { Fragment, useState } from 'react'
-import { CheckIcon, ChevronDownIcon } from '@heroicons/react/solid';
+import { useEffect, useState } from 'react'
+import { CheckIcon, } from '@heroicons/react/solid';
 import { PlusIcon } from '@heroicons/react/solid';
 import Modal from '@common/Modal'
 import FormProduct from '@components/FormProduct';
+import axios from 'axios';
+import endPoints from '@services/api'; 
 
-export default function products() {
-  const [products, setProductts] = useState([]);
+export default function Products() {
+  const [products, setProducts] = useState([]);
   const [open, setOpen] = useState(false);
+
+  // useEffect(() => {
+  //   async function getProducts() {
+  //     const response = await axios.get(endPoints.products.allProducts);
+  //     setProducts(response.data);
+  //   }
+  //   try {
+  //     getProducts();
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }, []);
 
   return (
     <>
