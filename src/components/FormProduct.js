@@ -1,9 +1,11 @@
 import { useRef } from 'react';
 import { addProduct } from '@services/api/products';
+import { updateProduct } from '@services/api/products';
+import { useRouter } from 'next/router';
 
-
-export default function FormProduct( { setOpen, setAlert, product } ) {
+export default function FormProduct({ setOpen, setAlert, product }) {
   const formRef = useRef(null); //null como primera instancia
+  const router = useRouter();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -17,27 +19,35 @@ export default function FormProduct( { setOpen, setAlert, product } ) {
       categoryId: parseInt(formData.get('category')),
       images: [formData.get('images').name],
     };
-    addProduct(data).then((response) => {
-      setAlert({
-        active: true,
-        message: 'product added successfully',
-        type: 'success',
-        autoClose: false,
+
+    if (product) {
+      updateProduct(product.id, data).then(() => {
+        router.push('/dashboard/products/');
       });
-      setOpen(false);
-      // console.log(response);
-    }).catch((error) => {
-        setAlert ({
-        active: true,
-        message: error.message,
-        type: 'error',
-        autoClose: false,
-      });
-  });
-};
+    } else {
+      addProduct(data)
+        .then((response) => {
+          setAlert({
+            active: true,
+            message: 'product added successfully',
+            type: 'success',
+            autoClose: false,
+          });
+          setOpen(false);
+          // console.log(response);
+        })
+        .catch((error) => {
+          setAlert({
+            active: true,
+            message: error.message,
+            type: 'error',
+            autoClose: false,
+          });
+        });
+    }
+  };
 
   return (
-
     <form ref={formRef} onSubmit={handleSubmit}>
       <div className="overflow-hidden">
         <div className="px-4 py-5 bg-white sm:p-6">
@@ -46,13 +56,25 @@ export default function FormProduct( { setOpen, setAlert, product } ) {
               <label htmlFor="title" className="block text-sm font-medium text-gray-700">
                 Title
               </label>
-              <input defaultValue={product?.title} type="text" name="title" id="title" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+              <input
+                defaultValue={product?.title}
+                type="text"
+                name="title"
+                id="title"
+                className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              />
             </div>
             <div className="col-span-6 sm:col-span-3">
               <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                 Price
               </label>
-              <input defaultValue={product?.price} type="number" name="price" id="price" className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" />
+              <input
+                defaultValue={product?.price}
+                type="number"
+                name="price"
+                id="price"
+                className="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+              />
             </div>
             <div className="col-span-6">
               <label htmlFor="category" className="block text-sm font-medium text-gray-700">
@@ -78,7 +100,7 @@ export default function FormProduct( { setOpen, setAlert, product } ) {
                 Description
               </label>
               <textarea
-              defaultValue={product?.description}
+                defaultValue={product?.description}
                 name="description"
                 id="description"
                 autoComplete="description"
