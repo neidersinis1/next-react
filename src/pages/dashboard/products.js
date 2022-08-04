@@ -1,13 +1,14 @@
 // import { useState } from 'react';
-import { useEffect, useState } from 'react'
-import { CheckIcon, } from '@heroicons/react/solid';
+import { useEffect, useState } from 'react';
+import { CheckIcon, XCircleIcon } from '@heroicons/react/solid';
 import { PlusIcon } from '@heroicons/react/solid';
-import Modal from '@common/Modal'
+import Modal from '@common/Modal';
 import FormProduct from '@components/FormProduct';
 import axios from 'axios';
-import endPoints from '@services/api'; 
+import endPoints from '@services/api';
 import useAlert from '@hooks/useAlert';
 import Alert from '@common/Alert';
+import { deleteProduct } from '@services/api/products';
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -26,21 +27,39 @@ export default function Products() {
     }
   }, [alert]);
 
+  const handLeDelete = (id) => {
+    deleteProduct(id)
+      .then(() => {
+        setAlert({
+          active: true,
+          message: 'Delete product successfuly',
+          type: 'error',
+          autoClose: true,
+        });
+      })
+      .catch((error) => {
+        setAlert({
+          active: true,
+          message: error.message,
+          type: 'error',
+          autoClose: false,
+        });
+      });
+  };
 
   return (
     <>
       <Alert alert={alert} handleClose={toggleAlert} />
       <div className="lg:flex lg:items-center lg:justify-between mb-8">
         <div className="flex-1 min-w-0">
-          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-            List o Products
-          </h2>
+          <h2 className="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">List o Products</h2>
         </div>
         <div className="mt-5 flex lg:mt-0 lg:ml-4">
           <span className="sm:ml-3">
             <button
               type="button"
-              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" onClick={() => setOpen(true)}
+              className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+              onClick={() => setOpen(true)}
             >
               <PlusIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
               <CheckIcon className="-ml-1 mr-2 h-5 w-5" aria-hidden="true" />
@@ -114,9 +133,7 @@ export default function Products() {
                         </a>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900">
-                          Delete
-                        </a>
+                        <XCircleIcon className="flex-shrink-0 h-6 w-6 text-gray-400 cursor-pointer" arial-hidden="true" onClick={() => handLeDelete(product.id)} />
                       </td>
                     </tr>
                   ))}
